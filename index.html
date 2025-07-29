@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Expense Tracker</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #dbeafe, #f8fafc);
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.15);
+      padding: 25px;
+      max-width: 850px;
+      margin: auto;
+    }
+    h2, h3, h4 {
+      text-align: center;
+      color: #2563eb;
+      margin-bottom: 15px;
+    }
+    .form-group {
+      margin: 15px 0;
+    }
+    label {
+      font-weight: 600;
+      color: #374151;
+    }
+    input[type="text"], input[type="date"], input[type="number"] {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      outline: none;
+      width: 220px;
+      transition: 0.3s;
+    }
+    input:focus {
+      border-color: #2563eb;
+      box-shadow: 0px 0px 6px rgba(37, 99, 235, 0.3);
+    }
+    .options {
+      margin-top: 10px;
+    }
+    .options label {
+      font-weight: normal;
+      margin-right: 20px;
+      cursor: pointer;
+    }
+    .buttons {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .buttons button:first-child {
+      background: #2563eb;
+      color: white;
+    }
+    .buttons button:first-child:hover {
+      background: #1e40af;
+    }
+    .buttons button:last-child {
+      background: #10b981;
+      color: white;
+    }
+    .buttons button:last-child:hover {
+      background: #059669;
+    }
+    .message {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+    .success { color: #16a34a; }
+    .error { color: #dc2626; }
+    .card-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .card {
+      padding: 20px;
+      width: 200px;
+      text-align: center;
+      background: linear-gradient(135deg, #eff6ff, #dbeafe);
+      border-radius: 12px;
+      box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.15);
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    }
+    .card h4 {
+      margin: 0;
+      color: #1e40af;
+    }
+    .card p {
+      margin-top: 8px;
+      color: #374151;
+      font-weight: bold;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
+    }
+    th {
+      background: #2563eb;
+      color: white;
+      padding: 12px;
+    }
+    td {
+      padding: 12px;
+      text-align: center;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    tr:nth-child(even) {
+      background: #f9fafb;
+    }
+    tr:hover {
+      background: #e0f2fe;
+    }
+    .action-btn {
+      margin: 2px;
+      padding: 6px 12px;
+      font-size: 12px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .edit-btn {
+      background: #3b82f6;
+      color: white;
+    }
+    .edit-btn:hover {
+      background: #1d4ed8;
+    }
+    .delete-btn {
+      background: #ef4444;
+      color: white;
+    }
+    .delete-btn:hover {
+      background: #b91c1c;
+    }
+    .yes-btn {
+      background: #16a34a;
+      color: white;
+    }
+    .no-btn {
+      background: #6b7280;
+      color: white;
+    }
+    .back-btn {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 18px;
+      background: #6b7280;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .back-btn:hover {
+      background: #374151;
+    }
+    .grand-total {
+      text-align: center;
+      margin-top: 12px;
+      font-weight: bold;
+      font-size: 18px;
+      color: #111827;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>💰 Daily Expense Tracker</h2>
+
+    <!-- Input Form -->
+    <div id="formView">
+      <div class="form-group">
+        <label for="date">Date:</label><br>
+        <input type="date" id="date">
+      </div>
+
+      <div class="form-group">
+        <label>Expense:</label>
+        <div class="options">
+          <input type="radio" id="lunch" name="expense" value="Lunch" onclick="toggleOtherInput(false)">
+          <label for="lunch">Lunch</label>
+
+          <input type="radio" id="dinner" name="expense" value="Dinner" onclick="toggleOtherInput(false)">
+          <label for="dinner">Dinner</label>
+
+          <input type="radio" id="milk" name="expense" value="Milk" onclick="toggleOtherInput(false)">
+          <label for="milk">Milk</label>
+
+          <input type="radio" id="otherOption" name="expense" value="Other" onclick="toggleOtherInput(true)">
+          <label for="otherOption">Other</label>
+          <input type="text" id="otherInput" placeholder="Enter category" style="display:none;">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="amount">Amount:</label><br>
+        <input type="number" id="amount" placeholder="Enter amount" min="1">
+      </div>
+
+      <div class="buttons">
+        <button onclick="saveExpense()">💾 Save</button>
+        <button onclick="showMonths()">📊 All Expenses</button>
+      </div>
+
+      <div id="message" class="message"></div>
+    </div>
+
+    <!-- Month Cards -->
+    <div id="monthView" style="display:none;">
+      <h3>📅 Monthly Expenses</h3>
+      <div class="grand-total" id="grandTotal"></div>
+      <div class="card-container" id="monthCards"></div>
+      <button class="back-btn" onclick="backToForm()">← Back</button>
+    </div>
+
+    <!-- Month Details -->
+    <div id="monthDetail" style="display:none;">
+      <h3 id="monthTitle"></h3>
+      <h4>📌 Category Totals</h4>
+      <div class="card-container" id="categoryCards"></div>
+
+      <h4>📝 Daily Expenses</h4>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Expense</th>
+            <th>Amount</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="dailyTableBody"></tbody>
+      </table>
+
+      <button class="back-btn" onclick="showMonths()">← Back to Months</button>
+    </div>
+  </div>
+
+  <script>
+    let editIndex = null; 
+    let currentMonth = null;
+
+    // Default date
+    window.onload = function() {
+      const today = new Date();
+      document.getElementById('date').value = today.toISOString().split('T')[0];
+    };
+
+    function toggleOtherInput(show) {
+      document.getElementById('otherInput').style.display = show ? 'inline-block' : 'none';
+    }
+
+    function saveExpense() {
+      const date = document.getElementById('date').value;
+      let amount = parseFloat(document.getElementById('amount').value);
+      const selected = document.querySelector('input[name="expense"]:checked');
+      let expenseType = selected?.value;
+      const messageBox = document.getElementById('message');
+
+      if (expenseType === "Other") {
+        expenseType = document.getElementById('otherInput').value.trim();
+      }
+
+      if (!date || isNaN(amount) || amount <= 0 || !expenseType) {
+        messageBox.innerText = "❌ Expense not added. Please fill all fields correctly.";
+        messageBox.className = "message error";
+        return;
+      }
+
+      let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+      if (editIndex !== null) {
+        expenses[editIndex] = { date, expenseType, amount };
+        editIndex = null;
+        messageBox.innerText = "✅ Expense updated successfully!!";
+      } else {
+        expenses.push({ date, expenseType, amount });
+        messageBox.innerText = "✅ Expense added successfully!!";
+      }
+
+      messageBox.className = "message success";
+      localStorage.setItem('expenses', JSON.stringify(expenses));
+      resetForm();
+    }
+
+    function resetForm() {
+      const today = new Date();
+      document.getElementById('date').value = today.toISOString().split('T')[0];
+      document.getElementById('amount').value = "";
+      document.getElementById('otherInput').value = "";
+      document.getElementById('otherInput').style.display = "none";
+      document.querySelectorAll('input[name="expense"]').forEach(r => r.checked = false);
+    }
+
+    function showMonths() {
+      document.getElementById('formView').style.display = "none";
+      document.getElementById('monthDetail').style.display = "none";
+      document.getElementById('monthView').style.display = "block";
+
+      const expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+      const monthMap = {};
+
+      expenses.forEach((exp, index) => {
+        const dateObj = new Date(exp.date);
+        const month = dateObj.toLocaleString('default', { month: 'long', year: 'numeric' });
+        const key = dateObj.getFullYear() + "-" + (dateObj.getMonth()+1).toString().padStart(2,'0');
+        if (!monthMap[key]) monthMap[key] = { label: month, expenses: [] };
+        monthMap[key].expenses.push({ ...exp, index });
+      });
+
+      const sortedMonths = Object.keys(monthMap).sort();
+      const monthCards = document.getElementById('monthCards');
+      monthCards.innerHTML = "";
+
+      let grandTotal = 0;
+      sortedMonths.forEach(key => {
+        const monthData = monthMap[key];
+        const total = monthData.expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+        grandTotal += total;
+        monthCards.innerHTML += `<div class="card" onclick="showMonthDetail('${monthData.label}')">
+                                   <h4>${monthData.label}</h4>
+                                   <p>Total: ₹${total.toFixed(2)}</p>
+                                 </div>`;
+      });
+
+      document.getElementById('grandTotal').innerText = `💵 Grand Total: ₹${grandTotal.toFixed(2)}`;
+    }
+
+    function showMonthDetail(month) {
+      currentMonth = month;
+      document.getElementById('monthView').style.display = "none";
+      document.getElementById('monthDetail').style.display = "block";
+      document.getElementById('monthTitle').innerText = `📅 Expenses for ${month}`;
+
+      const expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+      const monthExpenses = expenses.map((e, i) => ({ ...e, index: i }))
+        .filter(e => {
+          const expMonth = new Date(e.date).toLocaleString('default', { month: 'long', year: 'numeric' });
+          return expMonth === month;
+        });
+
+      // Category Totals
+      const categoryMap = {};
+      monthExpenses.forEach(e => {
+        categoryMap[e.expenseType] = (categoryMap[e.expenseType] || 0) + (parseFloat(e.amount) || 0);
+      });
+
+      const categoryCards = document.getElementById('categoryCards');
+      categoryCards.innerHTML = "";
+      for (let cat in categoryMap) {
+        categoryCards.innerHTML += `<div class="card">
+                                      <h4>${cat}</h4>
+                                      <p>Total: ₹${categoryMap[cat].toFixed(2)}</p>
+                                    </div>`;
+      }
+
+      // Daily Expenses
+      const dailyTable = document.getElementById('dailyTableBody');
+      dailyTable.innerHTML = "";
+      monthExpenses.forEach(e => {
+        dailyTable.innerHTML += `<tr id="row-${e.index}">
+                                   <td>${e.date}</td>
+                                   <td>${e.expenseType}</td>
+                                   <td>₹${parseFloat(e.amount).toFixed(2)}</td>
+                                   <td class="actions">
+                                     <button class="action-btn edit-btn" onclick="editExpense(${e.index})">Edit</button>
+                                     <button class="action-btn delete-btn" onclick="deleteExpense(${e.index})">Delete</button>
+                                   </td>
+                                 </tr>`;
+      });
+    }
+
+    function editExpense(index) {
+      const expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+      const exp = expenses[index];
+      document.getElementById('date').value = exp.date;
+      document.getElementById('amount').value = exp.amount;
+      document.querySelectorAll('input[name="expense"]').forEach(r => {
+        r.checked = (r.value === exp.expenseType);
+      });
+
+      if (!["Lunch","Dinner","Milk"].includes(exp.expenseType)) {
+        document.getElementById('otherOption').checked = true;
+        toggleOtherInput(true);
+        document.getElementById('otherInput').value = exp.expenseType;
+      } else {
+        toggleOtherInput(false);
+      }
+
+      editIndex = index;
+      backToForm();
+    }
+
+    function deleteExpense(index) {
+      const row = document.querySelector(`#row-${index}`);
+      const cell = row.querySelector(".actions");
+
+      cell.innerHTML = `
+        <span style="color:red; font-weight:bold;">Confirm?</span><br>
+        <button class="action-btn yes-btn" onclick="confirmDelete(${index}, true)">Yes</button>
+        <button class="action-btn no-btn" onclick="confirmDelete(${index}, false)">No</button>
+      `;
+    }
+
+    function confirmDelete(index, confirm) {
+      let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+      if (confirm) {
+        expenses.splice(index, 1);
+        localStorage.setItem('expenses', JSON.stringify(expenses));
+      }
+      showMonthDetail(currentMonth); // reload view
+    }
+
+    function backToForm() {
+      document.getElementById('monthView').style.display = "none";
+      document.getElementById('monthDetail').style.display = "none";
+      document.getElementById('formView').style.display = "block";
+    }
+  </script>
+</body>
+</html>

@@ -43,14 +43,20 @@
       border-color: #2563eb;
       box-shadow: 0px 0px 6px rgba(37, 99, 235, 0.3);
     }
+
     .options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
       margin-top: 10px;
     }
-    .options label {
-      font-weight: normal;
-      margin-right: 20px;
-      cursor: pointer;
+
+    .option-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
+
     .buttons {
       display: flex;
       justify-content: space-around;
@@ -192,6 +198,14 @@
       font-size: 18px;
       color: #111827;
     }
+
+    /* Responsive fix to maintain radio + label in same line */
+    @media (max-width: 600px) {
+      .options {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
   </style>
 </head>
 <body>
@@ -208,17 +222,22 @@
       <div class="form-group">
         <label>Expense:</label>
         <div class="options">
-          <input type="radio" id="lunch" name="expense" value="Lunch" onclick="toggleOtherInput(false)">
-          <label for="lunch">Lunch</label>
-
-          <input type="radio" id="dinner" name="expense" value="Dinner" onclick="toggleOtherInput(false)">
-          <label for="dinner">Dinner</label>
-
-          <input type="radio" id="milk" name="expense" value="Milk" onclick="toggleOtherInput(false)">
-          <label for="milk">Milk</label>
-
-          <input type="radio" id="otherOption" name="expense" value="Other" onclick="toggleOtherInput(true)">
-          <label for="otherOption">Other</label>
+          <div class="option-item">
+            <input type="radio" id="lunch" name="expense" value="Lunch" onclick="toggleOtherInput(false)">
+            <label for="lunch">Lunch</label>
+          </div>
+          <div class="option-item">
+            <input type="radio" id="dinner" name="expense" value="Dinner" onclick="toggleOtherInput(false)">
+            <label for="dinner">Dinner</label>
+          </div>
+          <div class="option-item">
+            <input type="radio" id="milk" name="expense" value="Milk" onclick="toggleOtherInput(false)">
+            <label for="milk">Milk</label>
+          </div>
+          <div class="option-item">
+            <input type="radio" id="otherOption" name="expense" value="Other" onclick="toggleOtherInput(true)">
+            <label for="otherOption">Other</label>
+          </div>
           <input type="text" id="otherInput" placeholder="Enter category" style="display:none;">
         </div>
       </div>
@@ -268,11 +287,11 @@
   </div>
 
   <script>
-    let editIndex = null; 
+    let editIndex = null;
     let currentMonth = null;
 
     // Default date
-    window.onload = function() {
+    window.onload = function () {
       const today = new Date();
       document.getElementById('date').value = today.toISOString().split('T')[0];
     };
@@ -333,7 +352,7 @@
       expenses.forEach((exp, index) => {
         const dateObj = new Date(exp.date);
         const month = dateObj.toLocaleString('default', { month: 'long', year: 'numeric' });
-        const key = dateObj.getFullYear() + "-" + (dateObj.getMonth()+1).toString().padStart(2,'0');
+        const key = dateObj.getFullYear() + "-" + (dateObj.getMonth() + 1).toString().padStart(2, '0');
         if (!monthMap[key]) monthMap[key] = { label: month, expenses: [] };
         monthMap[key].expenses.push({ ...exp, index });
       });
@@ -409,7 +428,7 @@
         r.checked = (r.value === exp.expenseType);
       });
 
-      if (!["Lunch","Dinner","Milk"].includes(exp.expenseType)) {
+      if (!["Lunch", "Dinner", "Milk"].includes(exp.expenseType)) {
         document.getElementById('otherOption').checked = true;
         toggleOtherInput(true);
         document.getElementById('otherInput').value = exp.expenseType;
@@ -448,4 +467,5 @@
     }
   </script>
 </body>
+
 </html>
